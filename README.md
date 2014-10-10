@@ -10,4 +10,4 @@ where $A(m)$ is the discretized Helmholtz operator $\omega^2 m + \nabla^2$ with 
 $P$ is the sampling operator, $q_i$ are the source vectors, $d_i$ are the observed data and $L$ is the discretized 
 $\nabla$.
 
-The main function is |misfit.m|
+The main function is *misfit.m*
