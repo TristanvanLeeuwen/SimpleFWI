@@ -25,26 +25,3 @@ L  = -kron(speye(n(2)),D1'*D1) - kron(D2'*D2,speye(n(1)));
 a = ones(n); a(:,[1 end]) = .5; a([1 end],:) = .5; a = a(:);
 
 A = omega^2*diags(a.*m) + (2i*omega/h(1))*diags((1-a).*sqrt(m)) + L;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-if (f > min(1e3*1./sqrt(m))/(7.5*h(1)))
-    warning('I told you not to set the frequency too high or too low Sasha! :)');
-end

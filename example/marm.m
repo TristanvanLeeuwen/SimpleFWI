@@ -46,11 +46,16 @@ m = 1./v(:).^2;
 % data
 D = F(m,model);
 
-%% inversion
+%% Jacobian
 
 %initial model
 m0 = vec(1./v0(zz,xx).^2);
 
+[D0,J0] = F(m0,model);
+
+dm = J0'*(D(:) - D0(:));
+
+%% inversion
 % misfit
 fh = @(m)misfit(m,D,alpha,model);
 
