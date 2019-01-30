@@ -63,7 +63,7 @@ function y = Jmv(x,m,U,model,flag)
             Ak = getA(model.f(k),m,model.h,model.n);
             Gk = @(u)getG(model.f(k),m,u,model.h,model.n);
             for l = 1:ns
-               Rk(:,l) = Gk(U(:,l,k))*x;
+               Rk(:,l) = -Gk(U(:,l,k))*x;
             end
             y(:,:,k) = P'*(Ak\Rk);
         end
@@ -76,7 +76,7 @@ function y = Jmv(x,m,U,model,flag)
             Gk = @(u)getG(model.f(k),m,u,model.h,model.n);
             Rk = Ak'\(P*x(:,:,k));
             for l = 1:size(U,2)
-                y = y + Gk(U(:,l,k))'*Rk(:,l);
+                y = y - Gk(U(:,l,k))'*Rk(:,l);
             end
         end
     end

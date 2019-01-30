@@ -1,3 +1,3 @@
 addpath([pwd '/core']);
 addpath([pwd '/optimization']);
-addpath([pwd '/spot'])
+addpath(['/data/leeuw041/Tools/spot'])

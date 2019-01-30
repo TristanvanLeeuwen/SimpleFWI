@@ -1,29 +1,30 @@
 %% setup
 
-% read model, dx = 20 or 50
-dx = 50;
-v  = dlmread(['marm_' num2str(dx) '.dat']);
+% defined model
+dx = 10;
+v = 2 + 0.25*phantom([1, .5, .5, 0, 0, 0],1e3/dx + 1);
 
 % initial model
-v0 = @(zz,xx)v(1)+.7e-3*max(zz-350,0);
+v0 = @(z,x)2 + 0*z;
 
 % set frequency, do not set larger than min(1e3*v(:))/(7.5*dx) or smaller
 % than 0.5
 
-f  = [2 3 4];
+f  = [5 10 15];
 
-% receivers, xr = .1 - 10km, with 2*dx spacing, zr = 2*dx
-xr = 100:2*dx:10000;
+% receivers
+xr = dx:2*dx:1e3-dx;
 zr = 2*dx*ones(1,length(xr));
 
-% sources, xr = .1 - 10km, with 4*dx spacing, zr = 2*dx
-xs = 100:4*dx:10000;
-zs = 2*dx*ones(1,length(xs));
+% sources
+xs = dx:2*dx:1e3-dx;
+zs = dx*ones(1,length(xr));
 
 % regularization parameter
 alpha = 0;
 
 %% observed data
+
 % grid
 n  = size(v);
 h  = dx*[1 1];
@@ -54,7 +55,7 @@ m0 = vec(1./v0(zz,xx).^2);
 fh = @(m)misfit(m,D,alpha,model);
 
 % Simple SD iteration
-[mk,hist] = SDiter(fh,m0,1e-3,10,1);
+[mk,hist] = SDiter(fh,m0,1e-3,20,.1);
 
 %% plot
 vk = reshape(real(1./sqrt(mk)),n);
