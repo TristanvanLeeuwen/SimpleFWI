@@ -9,16 +9,10 @@ function P = getP(h,n,zt,xt)
 %   zt,xt - arrays defining sampling points (must coincide with grid)
 %
 % output
-%   P     - sparse matrix
+%   P     - spot operator
 
 
 z  = [0:n(1)-1]*h(1);
 x  = [0:n(2)-1]*h(2);
-[zz,xx] = ndgrid(z,x);
 
-for k = 1:length(zt)
-    i(k) = find((zz(:)==zt(k))&(xx(:)==xt(k)));
-end
-
-I = speye(prod(n));
-P = I(:,i)/sqrt(prod(h));
+P = opLInterp2D(z(:), x(:), [zt(:), xt(:)]);

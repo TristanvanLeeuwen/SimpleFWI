@@ -1,4 +1,4 @@
-function [D,J] = F(m,model)
+function [D,J] = F(m,Q,model)
 % Forward operator
 %
 %   D = P^TA^{-1}(m)Q
@@ -27,17 +27,17 @@ function [D,J] = F(m,model)
     nf = length(model.f);
     nx = prod(model.n);
     
-    % generate matrices
-    P = getP(model.h,model.n,model.zr,model.xr);
-    Q = getP(model.h,model.n,model.zs,model.xs);
-
+    %  sampling operators
+    Pr = getP(model.h,model.n,model.zr,model.xr);
+    Ps = getP(model.h,model.n,model.zs,model.xs);
+    
     % solve
     U = zeros(nx,ns,nf);
     D = zeros(nr,ns,nf);
     for k = 1:nf
         Ak = getA(model.f(k),m,model.h,model.n);
-        U(:,:,k) = Ak\Q;
-        D(:,:,k) = P'*U(:,:,k);
+        U(:,:,k) = Ak\full(Ps'*Q);
+        D(:,:,k) = Pr*U(:,:,k);
     end
     D = D(:);
     % Jacobian
@@ -53,7 +53,7 @@ function y = Jmv(x,m,U,model,flag)
     nx = prod(model.n);
     
     %% get matrices
-    P = getP(model.h,model.n,model.zr,model.xr);
+    Pr = getP(model.h,model.n,model.zr,model.xr);
  
     %% compute mat-vec
     if flag == 1
@@ -65,7 +65,7 @@ function y = Jmv(x,m,U,model,flag)
             for l = 1:ns
                Rk(:,l) = -Gk(U(:,l,k))*x;
             end
-            y(:,:,k) = P'*(Ak\Rk);
+            y(:,:,k) = Pr*(Ak\Rk);
         end
         y = y(:);
     else
@@ -74,7 +74,7 @@ function y = Jmv(x,m,U,model,flag)
         for k = 1:nf
             Ak = getA(model.f(k),m,model.h,model.n);
             Gk = @(u)getG(model.f(k),m,u,model.h,model.n);
-            Rk = Ak'\(P*x(:,:,k));
+            Rk = Ak'\(Pr'*x(:,:,k));
             for l = 1:size(U,2)
                 y = y - Gk(U(:,l,k))'*Rk(:,l);
             end

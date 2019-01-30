@@ -1,4 +1,4 @@
-function [f,g,H] = misfit(m,D,alpha,model)
+function [f,g,H] = misfit(m,Q,D,alpha,model)
 % Evaluate least-squares misfit
 %
 %   0.5||P^TA^{-1}(m)Q - D||_{F}^2 + 0.5\alpha||Lm||_2^2,
@@ -31,7 +31,7 @@ L = getL(model.h,model.n);
 
 
 %% forward solve
-[Dp,Jp] = F(m,model);
+[Dp,Jp] = F(m,Q,model);
 
 %% compute f
 f = .5*norm(Dp - D)^2 + .5*alpha*norm(L*m)^2;
