@@ -37,7 +37,7 @@ function [D,J] = F(m,Q,model)
     for k = 1:nf
         Ak = getA(model.f(k),m,model.h,model.n);
         U(:,:,k) = Ak\full(Ps'*Q);
-        D(:,:,k) = Pr*U(:,:,k);
+        D(:,:,k) = model.w(k)*Pr*U(:,:,k);
     end
     D = D(:);
     % Jacobian
@@ -65,7 +65,7 @@ function y = Jmv(x,m,U,model,flag)
             for l = 1:ns
                Rk(:,l) = -Gk(U(:,l,k))*x;
             end
-            y(:,:,k) = Pr*(Ak\Rk);
+            y(:,:,k) = model.w(k)*Pr*(Ak\Rk);
         end
         y = y(:);
     else
@@ -74,7 +74,7 @@ function y = Jmv(x,m,U,model,flag)
         for k = 1:nf
             Ak = getA(model.f(k),m,model.h,model.n);
             Gk = @(u)getG(model.f(k),m,u,model.h,model.n);
-            Rk = Ak'\(Pr'*x(:,:,k));
+            Rk = Ak'\(conj(model.w(k))*(Pr'*x(:,:,k)));
             for l = 1:size(U,2)
                 y = y - Gk(U(:,l,k))'*Rk(:,l);
             end
