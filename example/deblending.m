@@ -1,7 +1,7 @@
 %% setup
 
 % computational domain
-dx = 10;
+dx = 50;
 L = [2000, 3000];
 
 % define model
@@ -14,7 +14,7 @@ v0 = @(z,x)2 + 1e-3*z;
 t = 0:1e-3:2;
 nt = length(t);
 f = 0:1/t(end):.5/(t(2)-t(1));
-f0 = 10;
+f0 = 5;
 t0 = 0.1;
 wt = (1 - 2*(pi*f0*(t-t0)).^2).*exp(-(pi*f0*(t-t0)).^2);
 wf = (2/sqrt(pi)/f0).*(f/f0).^2.*exp(-(f/f0).^2);
@@ -28,9 +28,9 @@ xr = linspace(.25*L(2),.75*L(2),nrec);
 
 
 % sources
-nsrc = 50;
+nsrc = 2;
 zs = .1*L(1)*ones(1,nsrc);
-xs = linspace(.25*L(2),.75*L(2),nsrc);
+xs = linspace(.4*L(2),.6*L(2),nsrc);
 
 % regularization parameter
 alpha = 0;
@@ -45,6 +45,7 @@ x  = [0:n(2)-1]*h(2);
 
 % parameters
 model.f = f(If);
+model.w = wf(If);
 model.n = n;
 model.h = h;
 model.zr = zr;
@@ -58,47 +59,48 @@ m = 1./v(zz(:),xx(:)).^2;
 % data
 Q = eye(nsrc);
 
-%D = F(m,Q,model);
-%save('data.mat',D);
+D = F(m,Q,model);
+save('data.mat','D');
 
-load('data.mat')
+%load('data.mat')
 
 %% Blending
-nsim = 10;
+nsim = 2;
+a = 1 + 2*rand(nsrc,nsim);
+tau = .1 + .2*rand(nsrc,nsim);
 
-phi = 2*pi*f(If)*(.1 + 0*rand(length(If)));
-%Bs = Q(mod(0 + (0:5:nsrc-1),nsrc)+1,:) + Q(mod(1 + (0:5:nsrc-1),nsrc)+1,:) + Q(mod(2 + (0:5:nsrc-1),nsrc)+1,:) + Q(mod(3 + (0:5:nsrc-1),nsrc)+1,:) + Q(mod(4 + (0:5:nsrc-1),nsrc)+1,:);
-Bs = randn(nsim,nrec);
-Br = opDirac(nrec);
-Bf = opDiag(exp(1i*phi));
+B = @(f) Q*a.*exp(1i*2*pi*f*tau);
 
-B = opKron(opMatrix(Bs),Br);
-
-Y = B*D*Bf';
-
-%% deblending
-X = zeros(nrec*nsrc,length(If));
-for k = 1:length(nf)
-    Yk = reshape(Y(:,k),nrec,nsim);
-    Xk = exp(1i*phi(k))*Br'*Yk*Bs;
-    X(:,k) = Xk(:);
+D = reshape(D,nrec,nsrc,length(If));
+Y = zeros(nrec,nsim,length(If));
+for k = 1:length(If)
+    Y(:,:,k) = D(:,:,k)*B(f(If(k)));
 end
 
-%X = B'*Y*Bf;
+
+%% deblending
+Y = reshape(Y,nrec,nsim,length(If));
+X = zeros(nrec, nsrc,length(If));
+for k = 1:length(If)
+    %X(:,:,k) = Y(:,:,k)*B(f(If(k)))';
+    X(:,:,k) = Y(:,:,k)*B(f(If(k)))'*inv(B(f(If(k)))*B(f(If(k)))');
+end
 
 %% Fourier transform
 Fr = opDFTR(nt);
 Rf = opRestriction(length(f),If);
-D = reshape(D,nsrc*nrec,[]);
-W = opDiag(Fr*wt(:));
 
-Dt = Fr'*W*Rf'*D';
-Yt = Fr'*W*Rf'*Y';
-Xt = Fr'*W*Rf'*X';
+D = reshape(D,nsrc*nrec,[]);
+Y = reshape(Y,nsim*nrec,[]);
+X = reshape(X,nsrc*nrec,[]);
+
+Dt = Fr'*Rf'*D';
+Yt = Fr'*Rf'*Y';
+Xt = Fr'*Rf'*X';
 
 %%
-Is = [1 nsrc/2 nsrc];
-Iss = [1 nsim/2 nsim];
+Is = [1,2];
+Iss = [1,2];
 Dt = reshape(Dt,nt,nrec,nsrc);
 Yt = reshape(Yt,nt,nrec,nsim);
 Xt = reshape(Xt,nt,nrec,nsrc);
@@ -108,19 +110,19 @@ imagesc(x,z,v(zz,xx));axis equal tight
 
 figure;
 Dt = reshape(Dt,nt,nrec,nsrc);
-for k = 1:3
-    subplot(1,3,k);imagesc(xr,t,Dt(:,:,Is(k)));colormap(gray)
+for k = 1:length(Is)
+    subplot(1,length(Is),k);imagesc(xr,t,Dt(:,:,Is(k)));colormap(gray)
 end
 
 figure;
 Yt = reshape(Yt,nt,nrec,nsim);
-for k = 1:3
-    subplot(1,3,k);imagesc(xr,t,Yt(:,:,Iss(k)));colormap(gray)
+for k = 1:length(Iss)
+    subplot(1,length(Iss),k);imagesc(xr,t,Yt(:,:,Iss(k)));colormap(gray)
 end
 
 figure;
 Xt = reshape(Xt,nt,nrec,nsrc);
-for k = 1:3
-    subplot(1,3,k);imagesc(xr,t,Xt(:,:,Is(k)));colormap(gray)
+for k = 1:length(Is)
+    subplot(1,length(Is),k);imagesc(xr,t,Xt(:,:,Is(k)));colormap(gray)
 end
 %%

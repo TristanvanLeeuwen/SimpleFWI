@@ -10,7 +10,8 @@ v0 = @(z,x)2 + 0*z;
 % set frequency, do not set larger than min(1e3*v(:))/(7.5*dx) or smaller
 % than 0.5
 
-f  = [5 10 15];
+f = [5 10 15];
+w = [.25, 1, .25];
 
 % receivers
 xr = dx:2*dx:1e3-dx;
@@ -34,6 +35,7 @@ x  = [0:n(2)-1]*h(2);
 
 % parameters
 model.f = f;
+model.w = w;
 model.n = n;
 model.h = h;
 model.zr = zr;
