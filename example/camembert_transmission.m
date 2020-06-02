@@ -51,8 +51,10 @@ model.xs = xs;
 % model
 m = 1./v(zz(:),xx(:)).^2;
 
-% data
+% source
 Q = eye(length(xs));
+
+% data
 D = F(m,Q,model);
 
 %initial model
@@ -63,7 +65,7 @@ m0 = vec(1./v0(zz,xx).^2);
 fh = @(m)misfit(m,Q,D,alpha,model);
 
 % Simple SD iteration
-[mk,hist] = SDiter(fh,m0,1e-3,20,1e-6);
+[mk,hist] = SDiter(fh,m0,1e-3,20,1e-4);
 
 %% plot
 vk = reshape(real(1./sqrt(mk)),n);

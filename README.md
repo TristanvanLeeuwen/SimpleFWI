@@ -12,8 +12,8 @@ $\nabla$.
 
 The main function is *misfit.m*, which takes as input the medium parameters $m$ and the data $d_i$ (and definitions of $P$, $q_i$, $\omega$ etc.) and returns the misfit value, its gradient and a function handle to compute the action of the Gauss-Newton hessian.
 
-For an example, see */examples/marm.m*, which uses a simple BB iteration to solve the optimization problem. 
-Replace this with your favourite optimization algorithm and you're ready to roll!
+For an example, see */examples*, which uses a simple BB iteration to solve the optimization problem. 
+To run these, you need to install the SPOT library: https://github.com/mpf/spot
 
 Feel free to contact me with any questions, suggestions, etc.
 

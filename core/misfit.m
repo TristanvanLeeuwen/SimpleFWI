@@ -6,10 +6,11 @@ function [f,g,H] = misfit(m,Q,D,alpha,model)
 % where P, Q encode the receiver and source locations and L is the first-order FD matrix
 %
 % use:
-%   [f,g,H] = misfit(m,D,model)
+%   [f,g,H] = misfit(m,Q,D,model)
 %
 % input:
 %   m - squared-slownes [s^2/km^2]
+%   Q - source weights (see F.m)
 %   D - single-frequency data matrix
 %   alpha - regularization parameter
 %   model.h - gridspacing in each direction d = [d1, d2];

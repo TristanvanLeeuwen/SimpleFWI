@@ -10,6 +10,9 @@ function [D,J] = F(m,Q,model)
 %
 % input:
 %   m - squared-slownes [s^2/km^2]
+%   Q - source weights, matrix of size ns x ns', where ns is the size of
+%   the source grid (model.zs) and ns' determines the effective number of
+%   sources.
 %   model.h - gridspacing in each direction d = [d1, d2];
 %   model.n - number of gridpoints in each direction n = [n1, n2]
 %   model.f - frequency [Hz].

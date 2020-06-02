@@ -46,18 +46,21 @@ model.xs = xs;
 % model
 m = 1./v(:).^2;
 
+% source
+Q = eye(length(xs));
+
 % data
-D = F(m,model);
+D = F(m,Q,model);
 
 %initial model
 m0 = vec(1./v0(zz,xx).^2);
 
 %% inversion
 % misfit
-fh = @(m)misfit(m,D,alpha,model);
+fh = @(m)misfit(m,Q,D,alpha,model);
 
 % Simple SD iteration
-[mk,hist] = SDiter(fh,m0,1e-3,20,.1);
+[mk,hist] = BBiter(fh,m0,1e-3,50);
 
 %% plot
 vk = reshape(real(1./sqrt(mk)),n);

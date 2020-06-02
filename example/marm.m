@@ -10,7 +10,7 @@ v0 = @(zz,xx)v(1)+.7e-3*max(zz-350,0);
 % set frequency, do not set larger than min(1e3*v(:))/(7.5*dx) or smaller
 % than 0.5
 
-f  = [2 3 4];
+f  = [1 2 3];
 
 % receivers, xr = .1 - 10km, with 2*dx spacing, zr = 2*dx
 xr = 100:2*dx:10000;
@@ -43,18 +43,21 @@ model.xs = xs;
 % model
 m = 1./v(:).^2;
 
+% source
+Q = eye(length(xs));
+
 % data
-D = F(m,model);
+D = F(m,Q,model);
 
 %initial model
 m0 = vec(1./v0(zz,xx).^2);
 
 %% inversion
 % misfit
-fh = @(m)misfit(m,D,alpha,model);
+fh = @(m)misfit(m,Q,D,alpha,model);
 
 % Simple SD iteration
-[mk,hist] = SDiter(fh,m0,1e-3,10,1);
+[mk,hist] = SDiter(fh,m0,1e-3,10,1e-6);
 
 %% plot
 vk = reshape(real(1./sqrt(mk)),n);
